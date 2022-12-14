@@ -9,14 +9,12 @@ from .models import User
 
 
 class UserCreationForm(forms.ModelForm):
-    """A form for creating new users. Includes all the required
-    fields, plus a repeated password."""
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
 
     class Meta:
         model = User
-        fields = ('full_name', 'email')
+        fields = ('full_name', 'email', 'picture')
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -36,15 +34,11 @@ class UserCreationForm(forms.ModelForm):
 
 
 class UserChangeForm(forms.ModelForm):
-    """A form for updating users. Includes all the fields on
-    the user, but replaces the password field with admin's
-    disabled password hash display field.
-    """
     password = ReadOnlyPasswordHashField()
 
     class Meta:
         model = User
-        fields = ('full_name', 'email', 'password', 'is_active', 'is_admin')
+        fields = ('full_name', 'email', 'picture', 'password', 'is_active', 'is_admin')
 
 
 class UserAdmin(BaseUserAdmin):
@@ -59,7 +53,7 @@ class UserAdmin(BaseUserAdmin):
     list_filter = ('is_admin',)
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Personal info', {'fields': ('full_name',)}),
+        ('Personal info', {'fields': ('full_name', 'picture')}),
         ('Permissions', {'fields': ('is_admin',)}),
     )
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
@@ -67,7 +61,7 @@ class UserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('full_name', 'email', 'password1', 'password2'),
+            'fields': ('full_name', 'email', 'picture', 'password1', 'password2'),
         }),
     )
     search_fields = ('email',)
@@ -75,8 +69,5 @@ class UserAdmin(BaseUserAdmin):
     filter_horizontal = ()
 
 
-# Now register the new UserAdmin...
 admin.site.register(User, UserAdmin)
-# ... and, since we're not using Django's built-in permissions,
-# unregister the Group model from admin.
 admin.site.unregister(Group)

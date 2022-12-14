@@ -1,13 +1,18 @@
 from pathlib import Path
 import os
 from datetime import timedelta
+import environ
 from rest_framework.settings import api_settings
+
+
+environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -25,18 +30,22 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # 3rd party apps
-    'rest_framework',
-    'knox',
-
     # Project apps
     'users.apps.UsersConfig',
     'shows.apps.ShowsConfig',
     'lists.apps.ListsConfig',
     'comments.apps.CommentsConfig',
+
+    # 3rd party apps
+    'corsheaders',
+    'rest_framework',
+    'knox',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -72,14 +81,13 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get('DATABASE_NAME'),
-        'USER': os.environ.get('DATABASE_USER'),
-        'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
-        'HOST': os.environ.get('DATABASE_HOST'),
-        'PORT': os.environ.get('DATABASE_PORT')
+        'NAME': os.getenv('DATABASE_NAME'),
+        'USER': os.getenv('DATABASE_USER'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+        'HOST': os.getenv('DATABASE_HOST'),
+        'PORT': os.getenv('DATABASE_PORT')
     }
 }
-
 
 # Password validation
 
@@ -114,8 +122,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-# URL used for accessing media files
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
+# URL used for accessing media files
 MEDIA_URL = 'media/'
 
 # Default primary key field type
@@ -125,8 +134,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.User'
 
 CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:3000",
-    "http://localhost:3000",
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
 ]
 
 # rest framework settings
@@ -146,12 +155,11 @@ REST_KNOX = {
     'SECURE_HASH_ALGORITHM': 'cryptography.hazmat.primitives.hashes.SHA512',
     'AUTH_TOKEN_CHARACTER_LENGTH': 64,
     'TOKEN_TTL': timedelta(days=30),
-    'USER_SERIALIZER': 'knox.serializers.UserSerializer',
     'TOKEN_LIMIT_PER_USER': None,
     'AUTO_REFRESH': True,
-    'MIN_REFRESH_INTERVAL': timedelta(minutes=5),
+    'MIN_REFRESH_INTERVAL': 60 * 5,  # 5 minutes
     'EXPIRY_DATETIME_FORMAT': api_settings.DATETIME_FORMAT,
 }
 
-# google auth
-GOOGLE_OAUTH2_CLIENT_ID = os.environ.get('GOOGLE_OAUTH2_CLIENT_ID')
+# google oauth2
+GOOGLE_OAUTH2_CLIENT_ID = os.getenv('GOOGLE_OAUTH2_CLIENT_ID')
