@@ -3,7 +3,7 @@ from rest_framework import (
     generics
 )
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import permissions
 from knox.models import AuthToken
 from rest_framework.views import APIView
 
@@ -28,9 +28,9 @@ class GoogleAuth(APIView):
         return response
 
 
-class TestView(generics.RetrieveAPIView):
+class CurrentUserView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAdminUser]
 
     def get_object(self):
         return self.request.user

@@ -1,3 +1,4 @@
 from django.contrib import admin
+from .models.list_show import ListShow
 
-# Register your models here.
+admin.site.register(ListShow)

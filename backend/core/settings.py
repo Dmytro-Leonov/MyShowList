@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'knox',
+    'django_jsonform',
     'django_cleanup.apps.CleanupConfig',
 ]
 
