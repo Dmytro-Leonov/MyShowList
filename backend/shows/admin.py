@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from .models.country import Country
 from .models.franchise import Franchise
 from .models.franchise_show import FranchiseShow
@@ -8,6 +9,8 @@ from .models.show import Show
 from .models.show_person import ShowPerson
 from .models.user_show_rating import UserShowRating
 
+from .forms import ShowForm
+
 
 class ShowPersonInline(admin.TabularInline):
     model = ShowPerson
@@ -15,6 +18,7 @@ class ShowPersonInline(admin.TabularInline):
 
 
 class ShowAdmin(admin.ModelAdmin):
+    form = ShowForm
     model = Show
     prepopulated_fields = {'slug': ('english_name',)}
     readonly_fields = ('times_rated', 'ratings_sum', 'rating')

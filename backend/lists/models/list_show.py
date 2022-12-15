@@ -1,4 +1,5 @@
 from django.db import models
+import pgtrigger
 
 
 class ListShow(models.Model):
@@ -19,17 +20,38 @@ class ListShow(models.Model):
     )
 
     class ListType(models.TextChoices):
-        WATCHING = 'watching', 'Watching'
-        PLAN_TO_WATCH = 'plan_to_watch', 'Plan to Watch'
-        COMPLETED = 'completed', 'Completed'
-        DROPPED = 'dropped', 'Dropped'
+        WATCHING = 'CW', 'Watching'
+        PLAN_TO_WATCH = 'PW', 'Plan to Watch'
+        COMPLETED = 'FN', 'Finished'
+        DROPPED = 'DR', 'Dropped'
 
     list_type = models.CharField(
         choices=ListType.choices,
-        max_length=13,
+        max_length=2,
         db_index=True,
         blank=False
     )
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'list_show'
+        triggers = [
+            pgtrigger.Trigger(
+                name="delete_list_show_on_insert",
+                operation=pgtrigger.Insert,
+                when=pgtrigger.After,
+                func=
+                """
+                DELETE FROM 
+                    list_show
+                WHERE
+                    show_id = NEW.show_id and 
+                    user_id = NEW.user_id and
+                    list_type = OLD.list_type;
+                return NEW;
+                """,
+            ),
+        ]
 
     def __str__(self):
         return f'{self.user.full_name}: {self.show.english_name} - {self.list_type}'

@@ -7,10 +7,13 @@ class Genre(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
     genre_category = models.CharField(
-        choices=Show.ShowCategory.choices,
+        choices=Show.Category.choices,
         max_length=7,
         blank=False
     )
+
+    class Meta:
+        db_table = 'genre'
 
     def __str__(self):
         return f'{self.genre_category}: {self.name}'

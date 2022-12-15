@@ -10,5 +10,8 @@ class Franchise(models.Model):
         related_name='franchise'
     )
 
+    class Meta:
+        db_table = 'franchise'
+
     def __str__(self):
         return f'{self.name}'

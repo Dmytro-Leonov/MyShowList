@@ -45,5 +45,9 @@ class Comment(models.Model):
     )
     likes = models.IntegerField(default=0)
 
+    class Meta:
+        db_table = 'comment'
+
     def __str__(self):
         return f'{self.user.full_name} - {self.show.english_name}: {self.text[:40]}'
+

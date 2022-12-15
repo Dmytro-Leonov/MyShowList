@@ -1,18 +1,20 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django_jsonform.models.fields import ArrayField
+from datetime import datetime
 
 
 class Show(models.Model):
     id = models.AutoField(primary_key=True)
 
-    class ShowCategory(models.TextChoices):
+    class Category(models.TextChoices):
         MOVIE = 'movie', 'Movie'
         TV_SHOW = 'tv_show', 'TV Show'
         CARTOON = 'cartoon', 'Cartoon'
         ANIME = 'anime', 'Anime'
 
-    show_category = models.CharField(
-        choices=ShowCategory.choices,
+    category = models.CharField(
+        choices=Category.choices,
         max_length=7,
         db_index=True,
         blank=False
@@ -53,13 +55,17 @@ class Show(models.Model):
     )
 
     premiere_date = models.DateField(db_index=True)
+    finale_date = models.DateField(
+        blank=True,
+        null=True,
+    )
     slogan = models.CharField(max_length=200, blank=True)
     duration_minutes = models.PositiveSmallIntegerField(
         null=False,
         blank=False,
         verbose_name="duration in minutes"
     )
-    episodes = models.PositiveSmallIntegerField(blank=True, null=True)
+    episodes = models.CharField(max_length=100, blank=True, null=True)
     description = models.TextField(max_length=3000)
     times_rated = models.PositiveIntegerField(default=0)
     ratings_sum = models.PositiveIntegerField(default=0)
@@ -79,6 +85,17 @@ class Show(models.Model):
         to='Genre',
         related_name='shows'
     )
+
+    def _validate_premiere_finale_dates(self):
+        if self.premiere_date > self.finale_date:
+            raise ValidationError("Finale date cannot be before premiere date date.")
+
+    def save(self, *args, **kwargs):
+        self._validate_premiere_finale_dates()
+        return super().save(*args, **kwargs)
+
+    class Meta:
+        db_table = 'show'
 
     def __str__(self):
         return self.english_name

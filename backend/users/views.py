@@ -4,12 +4,12 @@ from rest_framework import (
 )
 from rest_framework.response import Response
 from rest_framework import permissions
-from knox.models import AuthToken
 from rest_framework.views import APIView
+from knox.models import AuthToken
 
-from .models import User
 from .utils import google_parse_id_token, download_user_picture
 
+from .models import User
 from .serializers import UserSerializer
 
 

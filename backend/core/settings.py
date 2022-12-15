@@ -38,13 +38,16 @@ INSTALLED_APPS = [
 
     # 3rd party apps
     'corsheaders',
+    'debug_toolbar',
     'rest_framework',
     'knox',
     'django_jsonform',
+    'pgtrigger',
     'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -123,7 +126,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # URL used for accessing media files
 MEDIA_URL = 'media/'
@@ -146,7 +149,8 @@ REST_FRAMEWORK = {
             'rest_framework.permissions.AllowAny'
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'knox.auth.TokenAuthentication'
+        'knox.auth.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication'
     ],
 }
 
@@ -164,3 +168,8 @@ REST_KNOX = {
 
 # google oauth2
 GOOGLE_OAUTH2_CLIENT_ID = os.getenv('GOOGLE_OAUTH2_CLIENT_ID')
+
+# set internal ips for debug toolbar
+INTERNAL_IPS = [
+    '127.0.0.1',
+]

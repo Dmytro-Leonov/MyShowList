@@ -17,8 +17,10 @@ class FranchiseShow(models.Model):
     )
     watch_order = models.PositiveSmallIntegerField()
 
+    class Meta:
+        db_table = 'franchise_show'
+        unique_together = [['franchise', 'watch_order']]
+
     def __str__(self):
         return f'{self.watch_order} - {self.franchise.name}'
 
-    class Meta:
-        unique_together = [['franchise', 'watch_order']]

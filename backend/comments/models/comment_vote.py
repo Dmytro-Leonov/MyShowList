@@ -27,3 +27,9 @@ class CommentVote(models.Model):
         blank=False,
         null=False
     )
+
+    class Meta:
+        db_table = 'comment_vote'
+
+    def __str__(self):
+        return f'{self.user.full_name}: {"Like" if self.vote == 1 else "Dislike"}'
