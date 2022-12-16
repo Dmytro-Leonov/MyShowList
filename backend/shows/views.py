@@ -1,15 +1,16 @@
+from django.shortcuts import get_object_or_404
 from django.db.models import (
     Subquery,
-    OuterRef
+    OuterRef,
+    Count
 )
-from django.shortcuts import get_object_or_404
 
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework import (
     generics,
     status
 )
-from rest_framework.views import APIView
 
 from lists.models import ListShow
 from .models import (
@@ -18,6 +19,8 @@ from .models import (
     Genre,
     Country
 )
+
+from .filters import ShowFilter
 
 from .serializers import (
     ShowsSearchSerializer,
@@ -30,24 +33,50 @@ from .serializers import (
 
 class ShowSearch(generics.ListAPIView):
     serializer_class = ShowsSearchSerializer
+    filterset_class = ShowFilter
 
     def get_queryset(self):
-        return Show.objects.all().only(
-            'english_name',
-            'slug',
-            'poster',
-            'category',
-            'rating',
-            'premiere_date',
-            'finale_date'
+        shows = (
+            Show
+            .objects
+            .only(
+                'english_name',
+                'slug',
+                'poster',
+                'category',
+                'rating',
+                'premiere_date',
+                'finale_date'
+            )
         )
+        if self.request.user.is_authenticated:
+            shows = (
+                shows
+                .annotate(
+                    my_list=Subquery(
+                        ListShow.objects.filter(
+                            user=self.request.user,
+                            show=OuterRef('id')
+                        )
+                        .values('list_type'),
+                    ),
+                    my_rate=Subquery(
+                        UserShowRating.objects.filter(
+                            user=self.request.user,
+                            show=OuterRef('id')
+                        )
+                        .values('rating'),
+                    )
+                )
+            )
+        return shows
 
 
 class ShowDetails(generics.RetrieveAPIView):
     serializer_class = ShowSerializer
 
     def get_object(self):
-        show = get_object_or_404(
+        query = (
             Show
             .objects
             .prefetch_related(
@@ -57,6 +86,11 @@ class ShowDetails(generics.RetrieveAPIView):
                 'show_people__person'
             )
             .annotate(
+                in_list=Count('user_lists')
+            )
+        )
+        if self.request.user.is_authenticated:
+            query.annotate(
                 my_list=Subquery(
                     ListShow.objects.filter(
                         user=self.request.user,
@@ -71,7 +105,9 @@ class ShowDetails(generics.RetrieveAPIView):
                     )
                     .values('rating'),
                 )
-            ),
+            )
+        show = get_object_or_404(
+            query,
             slug=self.kwargs['slug']
         )
         return show

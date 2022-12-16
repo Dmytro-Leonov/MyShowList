@@ -10,6 +10,9 @@ from .models.show import Show
 
 
 class ShowsSearchSerializer(serializers.ModelSerializer):
+    my_list = serializers.CharField(allow_null=True)
+    my_rate = serializers.IntegerField(allow_null=True)
+
     class Meta:
         model = Show
         fields = (
@@ -19,7 +22,9 @@ class ShowsSearchSerializer(serializers.ModelSerializer):
             'category',
             'rating',
             'premiere_date',
-            'finale_date'
+            'finale_date',
+            'my_list',
+            'my_rate',
         )
 
 
@@ -49,7 +54,7 @@ class GenreSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'name',
-            'genre_category'
+            'category'
         )
 
 
@@ -71,6 +76,7 @@ class ShowSerializer(serializers.ModelSerializer):
     countries = CountrySerializer(many=True)
     my_list = serializers.CharField(allow_null=True)
     my_rate = serializers.IntegerField(allow_null=True)
+    in_list = serializers.IntegerField()
 
     class Meta:
         model = Show
@@ -95,7 +101,8 @@ class ShowSerializer(serializers.ModelSerializer):
             'countries',
             'people',
             'my_list',
-            'my_rate'
+            'my_rate',
+            'in_list'
         )
 
 

@@ -6,7 +6,7 @@ class Genre(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, unique=True)
 
-    genre_category = models.CharField(
+    category = models.CharField(
         choices=Show.Category.choices,
         max_length=7,
         blank=False
@@ -16,4 +16,4 @@ class Genre(models.Model):
         db_table = 'genre'
 
     def __str__(self):
-        return f'{self.genre_category}: {self.name}'
+        return f'{self.category}: {self.name}'

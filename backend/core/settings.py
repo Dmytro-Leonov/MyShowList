@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'knox',
     'django_jsonform',
     'pgtrigger',
+    'django_filters',
     'django_cleanup.apps.CleanupConfig',
 ]
 
@@ -152,6 +153,11 @@ REST_FRAMEWORK = {
         'knox.auth.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication'
     ],
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 40,
 }
 
 # django rest knox settings
