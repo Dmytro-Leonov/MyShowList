@@ -52,7 +52,6 @@ class GetUserListShows(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         list_shows = self.get_queryset().filter(
             user_lists__user=self.request.user,
             user_lists__list_type=serializer.validated_data.get('list_type')
@@ -64,7 +63,6 @@ class GetUserListShows(generics.ListAPIView):
 class AddToList(generics.CreateAPIView):
     serializer_class = AddToListSerializer
     permission_classes = [permissions.IsAuthenticated]
-    http_method_names = 'post'
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
