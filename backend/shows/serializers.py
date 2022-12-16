@@ -1,6 +1,11 @@
 from rest_framework import serializers
 
-from .models import Person, ShowPerson, Genre
+from .models import (
+    Person,
+    ShowPerson,
+    Genre,
+    UserShowRating
+)
 from .models.show import Show
 
 
@@ -43,11 +48,12 @@ class GenreSerializer(serializers.ModelSerializer):
         model = Genre
         fields = (
             'id',
-            'name'
+            'name',
+            'genre_category'
         )
 
 
-class CountriesSerializer(serializers.ModelSerializer):
+class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = (
@@ -62,7 +68,7 @@ class ShowSerializer(serializers.ModelSerializer):
         many=True
     )
     genres = GenreSerializer(many=True)
-    countries = CountriesSerializer(many=True)
+    countries = CountrySerializer(many=True)
     my_list = serializers.CharField(allow_null=True)
     my_rate = serializers.IntegerField(allow_null=True)
 
@@ -91,3 +97,15 @@ class ShowSerializer(serializers.ModelSerializer):
             'my_list',
             'my_rate'
         )
+
+
+class RateShowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserShowRating
+        fields = (
+            'show',
+            'rating'
+        )
+
+
+
