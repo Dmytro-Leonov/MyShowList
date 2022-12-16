@@ -39,16 +39,15 @@ class ListShow(models.Model):
             pgtrigger.Trigger(
                 name="delete_list_show_on_insert",
                 operation=pgtrigger.Insert,
-                when=pgtrigger.After,
+                when=pgtrigger.Before,
                 func=
                 """
                 DELETE FROM 
                     list_show
                 WHERE
                     show_id = NEW.show_id and 
-                    user_id = NEW.user_id and
-                    list_type = OLD.list_type;
-                return NEW;
+                    user_id = NEW.user_id;
+                RETURN NEW;
                 """,
             ),
         ]
