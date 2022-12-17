@@ -83,7 +83,7 @@ class ShowDetails(APIView):
         franchise = Franchise.objects.franchise_shows_by_show_id(show.id)
 
         response = {
-            'show': ShowSerializer(show).data,
+            'show': ShowSerializer(show, context={'request': request}).data,
             'franchise': FranchiseSerializer(franchise).data
         }
         return Response(data=response, status=status.HTTP_200_OK)
@@ -104,7 +104,6 @@ class RateShow(generics.CreateAPIView):
 
 
 class ShowFilters(APIView):
-    http_method_names = 'get'
 
     def get(self, request, *args, **kwargs):
         genres = Genre.objects.all()

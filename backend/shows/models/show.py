@@ -1,6 +1,10 @@
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Subquery, OuterRef, Count
+from django.db.models import (
+    Subquery,
+    OuterRef,
+    Count
+)
 from django_jsonform.models.fields import ArrayField
 
 from lists.models import ListShow
@@ -13,25 +17,22 @@ class ShowManager(models.Manager):
             'in_lists': Count('user_lists'),
         }
         if user.is_authenticated:
-            annotation = {
-                **annotation,
-                'my_list':
-                    Subquery(
-                        ListShow.objects.filter(
-                            user=user,
-                            show=OuterRef('id')
-                        )
-                        .values('list_type'),
-                    ),
-                'my_rate':
-                    Subquery(
-                        UserShowRating.objects.filter(
-                            user=user,
-                            show=OuterRef('id')
-                        )
-                        .values('rating'),
+            annotation.update(
+                my_list=Subquery(
+                    ListShow.objects.filter(
+                        user=user,
+                        show=OuterRef('id')
                     )
-            }
+                    .values('list_type'),
+                ),
+                my_rate=Subquery(
+                    UserShowRating.objects.filter(
+                        user=user,
+                        show=OuterRef('id')
+                    )
+                    .values('rating'),
+                )
+            )
 
         queryset = (
             self
@@ -44,7 +45,6 @@ class ShowManager(models.Manager):
             .annotate(**annotation)
         )
         return queryset
-
 
 
 class Show(models.Model):
