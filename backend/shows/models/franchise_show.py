@@ -5,12 +5,14 @@ class FranchiseShow(models.Model):
     id = models.AutoField(primary_key=True)
     franchise = models.ForeignKey(
         'Franchise',
+        related_name='has_show',
         on_delete=models.CASCADE,
         blank=False,
         null=False
     )
     show = models.OneToOneField(
         'Show',
+        related_name='in_franchise',
         on_delete=models.CASCADE,
         blank=False,
         null=False

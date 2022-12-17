@@ -1,7 +1,50 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Subquery, OuterRef, Count
 from django_jsonform.models.fields import ArrayField
-from datetime import datetime
+
+from lists.models import ListShow
+
+
+class ShowManager(models.Manager):
+    def with_show_details_by_user(self, user):
+        from shows.models import UserShowRating
+        annotation = {
+            'in_lists': Count('user_lists'),
+        }
+        if user.is_authenticated:
+            annotation = {
+                **annotation,
+                'my_list':
+                    Subquery(
+                        ListShow.objects.filter(
+                            user=user,
+                            show=OuterRef('id')
+                        )
+                        .values('list_type'),
+                    ),
+                'my_rate':
+                    Subquery(
+                        UserShowRating.objects.filter(
+                            user=user,
+                            show=OuterRef('id')
+                        )
+                        .values('rating'),
+                    )
+            }
+
+        queryset = (
+            self
+            .prefetch_related(
+                'countries',
+                'genres',
+                'show_people',
+                'show_people__person',
+            )
+            .annotate(**annotation)
+        )
+        return queryset
+
 
 
 class Show(models.Model):
@@ -85,6 +128,8 @@ class Show(models.Model):
         to='Genre',
         related_name='shows'
     )
+
+    objects = ShowManager()
 
     def _validate_premiere_finale_dates(self):
         if self.premiere_date > self.finale_date:

@@ -1,4 +1,21 @@
 from django.db import models
+from django.db.models import Prefetch
+
+
+class FranchiseManager(models.Manager):
+    def franchise_shows_by_show_id(self, show_id: int):
+        from shows.models import Show
+        franchise = (
+            self
+            .prefetch_related(
+                Prefetch(
+                    'has_show__show',
+                    queryset=Show.objects.all().only('english_name'))
+            )
+            .filter(has_show__show_id=show_id)
+            .first()
+        )
+        return franchise
 
 
 class Franchise(models.Model):
@@ -9,6 +26,8 @@ class Franchise(models.Model):
         through='FranchiseShow',
         related_name='franchise'
     )
+
+    objects = FranchiseManager()
 
     class Meta:
         db_table = 'franchise'

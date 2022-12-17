@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import (
     Subquery,
     OuterRef,
-    Count
+    Count, Prefetch
 )
 
 from rest_framework.response import Response
@@ -17,7 +17,7 @@ from .models import (
     Show,
     UserShowRating,
     Genre,
-    Country
+    Country, Franchise, FranchiseShow
 )
 
 from .filters import ShowFilter
@@ -27,7 +27,7 @@ from .serializers import (
     ShowSerializer,
     RateShowSerializer,
     GenreSerializer,
-    CountrySerializer
+    CountrySerializer, FranchiseSerializer
 )
 
 
@@ -72,45 +72,21 @@ class ShowSearch(generics.ListAPIView):
         return shows
 
 
-class ShowDetails(generics.RetrieveAPIView):
-    serializer_class = ShowSerializer
-
-    def get_object(self):
-        query = (
-            Show
-            .objects
-            .prefetch_related(
-                'countries',
-                'genres',
-                'show_people',
-                'show_people__person'
-            )
-            .annotate(
-                in_list=Count('user_lists')
-            )
-        )
-        if self.request.user.is_authenticated:
-            query.annotate(
-                my_list=Subquery(
-                    ListShow.objects.filter(
-                        user=self.request.user,
-                        show=OuterRef('id')
-                    )
-                    .values('list_type'),
-                ),
-                my_rate=Subquery(
-                    UserShowRating.objects.filter(
-                        user=self.request.user,
-                        show=OuterRef('id')
-                    )
-                    .values('rating'),
-                )
-            )
+class ShowDetails(APIView):
+    def get(self, request, *args, **kwargs):
+        queryset = Show.objects.with_show_details_by_user(self.request.user)
         show = get_object_or_404(
-            query,
+            queryset,
             slug=self.kwargs['slug']
         )
-        return show
+
+        franchise = Franchise.objects.franchise_shows_by_show_id(show.id)
+
+        response = {
+            'show': ShowSerializer(show).data,
+            'franchise': FranchiseSerializer(franchise).data
+        }
+        return Response(data=response, status=status.HTTP_200_OK)
 
 
 class RateShow(generics.CreateAPIView):
@@ -138,4 +114,3 @@ class ShowFilters(APIView):
             'countries': CountrySerializer(countries, many=True).data
         }
         return Response(data=response, status=status.HTTP_200_OK)
-

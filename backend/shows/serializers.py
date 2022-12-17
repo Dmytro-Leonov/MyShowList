@@ -4,7 +4,9 @@ from .models import (
     Person,
     ShowPerson,
     Genre,
-    UserShowRating
+    UserShowRating,
+    FranchiseShow,
+    Franchise
 )
 from .models.show import Show
 
@@ -67,6 +69,36 @@ class CountrySerializer(serializers.ModelSerializer):
         )
 
 
+class ShowNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Show
+        fields = (
+            'english_name',
+        )
+
+
+class FranchiseShowSerializer(serializers.ModelSerializer):
+    show = ShowNameSerializer()
+
+    class Meta:
+        model = FranchiseShow
+        fields = (
+            'show',
+            'watch_order'
+        )
+
+
+class FranchiseSerializer(serializers.ModelSerializer):
+    shows = FranchiseShowSerializer(source='has_show', many=True)
+
+    class Meta:
+        model = Franchise
+        fields = (
+            'name',
+            'shows'
+        )
+
+
 class ShowSerializer(serializers.ModelSerializer):
     people = ShowPersonSerializer(
         source='show_people',
@@ -76,7 +108,7 @@ class ShowSerializer(serializers.ModelSerializer):
     countries = CountrySerializer(many=True)
     my_list = serializers.CharField(allow_null=True)
     my_rate = serializers.IntegerField(allow_null=True)
-    in_list = serializers.IntegerField()
+    in_lists = serializers.IntegerField()
 
     class Meta:
         model = Show
@@ -102,7 +134,7 @@ class ShowSerializer(serializers.ModelSerializer):
             'people',
             'my_list',
             'my_rate',
-            'in_list'
+            'in_lists'
         )
 
 
