@@ -34,12 +34,8 @@ class GetUserListShows(generics.ListAPIView):
             Show
             .objects
             .annotate(
-                my_rate=Subquery(
-                    UserShowRating.objects.filter(
-                        user=self.request.user,
-                        show=OuterRef('id')
-                    )
-                    .values('rating'),
+                my_rate=Show.objects.get_user_rating_for_show_subquery(
+                    self.request.user
                 )
             )
             .only(

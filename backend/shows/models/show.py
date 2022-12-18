@@ -12,7 +12,7 @@ from lists.models import ListShow
 
 class ShowManager(models.Manager):
     @staticmethod
-    def _get_user_list_for_show_subquery(user):
+    def get_user_list_for_show_subquery(user):
         list_type = (
             Subquery(
                 ListShow.objects.filter(
@@ -25,7 +25,7 @@ class ShowManager(models.Manager):
         return list_type
 
     @staticmethod
-    def _get_user_rating_for_show_subquery(user):
+    def get_user_rating_for_show_subquery(user):
         from shows.models import UserShowRating
         rating = (
             Subquery(
@@ -44,8 +44,8 @@ class ShowManager(models.Manager):
         }
         if user.is_authenticated:
             annotations.update(
-                my_list=self._get_user_list_for_show_subquery(user),
-                my_rate=self._get_user_rating_for_show_subquery(user)
+                my_list=self.get_user_list_for_show_subquery(user),
+                my_rate=self.get_user_rating_for_show_subquery(user)
             )
 
         return self.annotate(**annotations)
