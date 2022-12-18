@@ -7,6 +7,7 @@ from .views import (
     CommentUpdateDestroy
 )
 
+app_name = 'Comments'
 urlpatterns = [
     path('for-show/<int:id>/', ShowComments.as_view(), name='Show Comments'),
     path('for-comment/<int:id>/', CommentReplies.as_view(), name='Comment Replies'),

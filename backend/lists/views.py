@@ -1,8 +1,4 @@
-from django.db.models import (
-    Subquery,
-    OuterRef,
-    Count
-)
+from django.db.models import Count
 
 from rest_framework import (
     generics,
@@ -13,7 +9,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from shows.models.show import Show
-from shows.models.user_show_rating import UserShowRating
 from .models import ListShow
 
 from .serializers import (

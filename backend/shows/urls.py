@@ -6,6 +6,7 @@ from .views import (
     ShowFilters
 )
 
+app_name = 'Shows'
 urlpatterns = [
     path('', ShowSearch.as_view(), name='Show Search'),
     path('show/rate/', RateShow.as_view(), name='Rate Show'),

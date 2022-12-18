@@ -6,6 +6,7 @@ from .views import (
     ListsShowCount
 )
 
+app_name = 'Lists'
 urlpatterns = [
     path('list/', GetUserListShows.as_view(), name='Get User List Shows'),
     path('add-show/', AddToList.as_view(), name='Add to List'),
