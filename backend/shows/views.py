@@ -39,6 +39,7 @@ class ShowSearch(generics.ListAPIView):
         shows = (
             Show
             .objects
+            .with_show_details_by_user(self.request.user)
             .only(
                 'english_name',
                 'slug',
@@ -49,32 +50,22 @@ class ShowSearch(generics.ListAPIView):
                 'finale_date'
             )
         )
-        if self.request.user.is_authenticated:
-            shows = (
-                shows
-                .annotate(
-                    my_list=Subquery(
-                        ListShow.objects.filter(
-                            user=self.request.user,
-                            show=OuterRef('id')
-                        )
-                        .values('list_type'),
-                    ),
-                    my_rate=Subquery(
-                        UserShowRating.objects.filter(
-                            user=self.request.user,
-                            show=OuterRef('id')
-                        )
-                        .values('rating'),
-                    )
-                )
-            )
         return shows
 
 
 class ShowDetails(APIView):
     def get(self, request, *args, **kwargs):
-        queryset = Show.objects.with_show_details_by_user(self.request.user)
+        queryset = (
+            Show
+            .objects
+            .with_show_details_by_user(self.request.user)
+            .prefetch_related(
+                'countries',
+                'genres',
+                'show_people',
+                'show_people__person',
+            )
+        )
         show = get_object_or_404(
             queryset,
             slug=self.kwargs['slug']

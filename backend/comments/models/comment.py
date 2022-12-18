@@ -4,9 +4,24 @@ from django.db.models import Count, Subquery, OuterRef, BooleanField, Exists
 
 
 class CommentManager(models.Manager):
-    def detailed_info_with_replies_count(self, *, show_id: int = None, parent_comment_id: int = None, user=None):
+    @staticmethod
+    def _get_user_vote_subquery(user):
         from comments.models import CommentVote
+        subquery = (
+            Subquery(
+                Exists(
+                    CommentVote.objects.filter(
+                        user=user,
+                        comment_id=OuterRef('id')
+                    )
+                    .values('id')
+                ),
+                output_field=BooleanField()
+            )
+        )
+        return subquery
 
+    def detailed_info_with_replies_count(self, *, show_id: int = None, parent_comment_id: int = None, user=None):
         # validate inputs
         if not show_id and not parent_comment_id or show_id and parent_comment_id:
             raise TypeError('Ether show_id or parent_comment_id should be passed.')
@@ -14,19 +29,12 @@ class CommentManager(models.Manager):
         # create annotations based on input
         annotation = {}
         if parent_comment_id:
-            annotation = {'replies_count': Count('child_comments')}
+            annotation.update(
+                {'replies_count': Count('child_comments')}
+            )
         if user and user.is_authenticated:
             annotation.update(
-                voted=Subquery(
-                    Exists(
-                        CommentVote.objects.filter(
-                            user=user,
-                            comment_id=OuterRef('id')
-                        )
-                        .values('id')
-                    ),
-                    output_field=BooleanField()
-                )
+                voted=self._get_user_vote_subquery(user)
             )
 
         # create filters based on input
@@ -39,12 +47,8 @@ class CommentManager(models.Manager):
         # compose query
         comments = (
             self
-            .annotate(
-                **annotation
-            )
-            .filter(
-                **filters
-            )
+            .annotate(**annotation)
+            .filter(**filters)
             .select_related(
                 'user',
                 'reply_to_user'

@@ -11,40 +11,44 @@ from lists.models import ListShow
 
 
 class ShowManager(models.Manager):
-    def with_show_details_by_user(self, user):
+    @staticmethod
+    def _get_user_list_for_show_subquery(user):
+        list_type = (
+            Subquery(
+                ListShow.objects.filter(
+                    user=user,
+                    show=OuterRef('id')
+                )
+                .values('list_type'),
+            )
+        )
+        return list_type
+
+    @staticmethod
+    def _get_user_rating_for_show_subquery(user):
         from shows.models import UserShowRating
-        annotation = {
+        rating = (
+            Subquery(
+                UserShowRating.objects.filter(
+                    user=user,
+                    show=OuterRef('id')
+                )
+                .values('rating'),
+            )
+        )
+        return rating
+
+    def with_show_details_by_user(self, user):
+        annotations = {
             'in_lists': Count('user_lists'),
         }
         if user.is_authenticated:
-            annotation.update(
-                my_list=Subquery(
-                    ListShow.objects.filter(
-                        user=user,
-                        show=OuterRef('id')
-                    )
-                    .values('list_type'),
-                ),
-                my_rate=Subquery(
-                    UserShowRating.objects.filter(
-                        user=user,
-                        show=OuterRef('id')
-                    )
-                    .values('rating'),
-                )
+            annotations.update(
+                my_list=self._get_user_list_for_show_subquery(user),
+                my_rate=self._get_user_rating_for_show_subquery(user)
             )
 
-        queryset = (
-            self
-            .prefetch_related(
-                'countries',
-                'genres',
-                'show_people',
-                'show_people__person',
-            )
-            .annotate(**annotation)
-        )
-        return queryset
+        return self.annotate(**annotations)
 
 
 class Show(models.Model):
