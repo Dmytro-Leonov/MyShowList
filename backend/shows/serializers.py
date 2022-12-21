@@ -147,4 +147,7 @@ class RateShowSerializer(serializers.ModelSerializer):
         )
 
 
-
+class DeleteShowRateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserShowRating
+        fields = ('show',)

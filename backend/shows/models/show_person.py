@@ -20,7 +20,8 @@ class ShowPerson(models.Model):
 
     class PersonType(models.IntegerChoices):
         PRODUCER = 1, 'Producer'
-        ACTOR = 2, 'Actor'
+        WRITER = 2, 'Writer'
+        ACTOR = 3, 'Actor'
 
     person_type = models.IntegerField(
         choices=PersonType.choices,

@@ -114,10 +114,9 @@ class Show(models.Model):
     description = models.TextField(max_length=3000)
     times_rated = models.PositiveIntegerField(default=0)
     ratings_sum = models.PositiveIntegerField(default=0)
-    rating = models.DecimalField(
+    rating = models.FloatField(
         default=0,
-        decimal_places=5,
-        max_digits=7
+        db_index=True
     )
     date_added = models.DateTimeField(auto_now_add=True)
 

@@ -6,9 +6,8 @@ class Genre(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, unique=True)
 
-    category = models.CharField(
+    category = models.IntegerField(
         choices=Show.Category.choices,
-        max_length=7,
         blank=False
     )
 

@@ -4,7 +4,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import (
     generics,
-    status
+    status,
+    permissions
 )
 
 from .models import (
@@ -22,7 +23,9 @@ from .serializers import (
     ShowSerializer,
     RateShowSerializer,
     GenreSerializer,
-    CountrySerializer, FranchiseSerializer
+    CountrySerializer,
+    FranchiseSerializer,
+    DeleteShowRateSerializer
 )
 
 
@@ -75,22 +78,42 @@ class ShowDetails(APIView):
         return Response(data=response, status=status.HTTP_200_OK)
 
 
-class RateShow(generics.CreateAPIView):
-    serializer_class = RateShowSerializer
+class RateShow(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return RateShowSerializer
+        if self.request.method == 'DELETE':
+            return DeleteShowRateSerializer
+        return RateShowSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.get_serializer_class()(data=request.data)
         serializer.is_valid(raise_exception=True)
         UserShowRating.objects.create(
             user=self.request.user,
             **serializer.validated_data
         )
-        response = {'data': 'Your rate recorded.'}
+        response = {'data': 'Your rate was recorded.'}
         return Response(data=response, status=status.HTTP_201_CREATED)
+
+    def delete(self, request, *args, **kwargs):
+        serializer = self.get_serializer_class()(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        deleted, _ = UserShowRating.objects.filter(
+            user=self.request.user,
+            **serializer.validated_data
+        ).delete()
+
+        if deleted:
+            response = {'data': 'Your rate was deleted.'}
+        else:
+            response = {'data': "Your didn't rate this show."}
+        return Response(data=response, status=status.HTTP_204_NO_CONTENT)
 
 
 class ShowFilters(APIView):
-
     def get(self, request, *args, **kwargs):
         genres = Genre.objects.all()
         countries = Country.objects.all()
