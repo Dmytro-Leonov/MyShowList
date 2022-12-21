@@ -19,15 +19,14 @@ class ListShow(models.Model):
         null=False
     )
 
-    class ListType(models.TextChoices):
-        WATCHING = 'CW', 'Watching'
-        PLAN_TO_WATCH = 'PW', 'Plan to Watch'
-        COMPLETED = 'FN', 'Finished'
-        DROPPED = 'DR', 'Dropped'
+    class ListType(models.IntegerChoices):
+        WATCHING = 1, 'Watching'
+        PLAN_TO_WATCH = 2, 'Plan to Watch'
+        COMPLETED = 3, 'Finished'
+        DROPPED = 4, 'Dropped'
 
-    list_type = models.CharField(
+    list_type = models.IntegerField(
         choices=ListType.choices,
-        max_length=2,
         db_index=True,
         blank=False
     )

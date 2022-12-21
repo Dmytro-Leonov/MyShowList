@@ -18,13 +18,12 @@ class ShowPerson(models.Model):
         null=False
     )
 
-    class PersonType(models.TextChoices):
-        PRODUCER = 'producer', 'Producer'
-        ACTOR = 'actor', 'Actor'
+    class PersonType(models.IntegerChoices):
+        PRODUCER = 1, 'Producer'
+        ACTOR = 2, 'Actor'
 
-    person_type = models.CharField(
+    person_type = models.IntegerField(
         choices=PersonType.choices,
-        max_length=8,
         blank=False
     )
 

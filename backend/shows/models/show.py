@@ -54,15 +54,14 @@ class ShowManager(models.Manager):
 class Show(models.Model):
     id = models.AutoField(primary_key=True)
 
-    class Category(models.TextChoices):
-        MOVIE = 'movie', 'Movie'
-        TV_SHOW = 'tv_show', 'TV Show'
-        CARTOON = 'cartoon', 'Cartoon'
-        ANIME = 'anime', 'Anime'
+    class Category(models.IntegerChoices):
+        MOVIE = 1, 'Movie'
+        TV_SHOW = 2, 'TV Show'
+        CARTOON = 3, 'Cartoon'
+        ANIME = 4, 'Anime'
 
-    category = models.CharField(
+    category = models.IntegerField(
         choices=Category.choices,
-        max_length=7,
         db_index=True,
         blank=False
     )
@@ -87,16 +86,15 @@ class Show(models.Model):
 
     poster = models.ImageField(upload_to='posters/%Y/%m/%d/')
     
-    class AgeRating(models.TextChoices):
-        EVERYONE = 'E', '0+'
-        YOUTH = 'Y', '10+'
-        TEENS = 'T', '13+'
-        OLDER_TEENS = 'OT', '16+'
-        MATURE = 'M', '18+'
+    class AgeRating(models.IntegerChoices):
+        EVERYONE = 1, '0+'
+        YOUTH = 2, '10+'
+        TEENS = 3, '13+'
+        OLDER_TEENS = 4, '16+'
+        MATURE = 5, '18+'
 
-    age_rating = models.CharField(
+    age_rating = models.IntegerField(
         choices=AgeRating.choices,
-        max_length=2,
         db_index=True,
         blank=False
     )
@@ -116,7 +114,11 @@ class Show(models.Model):
     description = models.TextField(max_length=3000)
     times_rated = models.PositiveIntegerField(default=0)
     ratings_sum = models.PositiveIntegerField(default=0)
-    rating = models.PositiveIntegerField(default=0)
+    rating = models.DecimalField(
+        default=0,
+        decimal_places=5,
+        max_digits=7
+    )
     date_added = models.DateTimeField(auto_now_add=True)
 
     people = models.ManyToManyField(
@@ -136,7 +138,7 @@ class Show(models.Model):
     objects = ShowManager()
 
     def _validate_premiere_finale_dates(self):
-        if self.premiere_date > self.finale_date:
+        if self.finale_date and self.premiere_date > self.finale_date:
             raise ValidationError("Finale date cannot be before premiere date date.")
 
     def save(self, *args, **kwargs):

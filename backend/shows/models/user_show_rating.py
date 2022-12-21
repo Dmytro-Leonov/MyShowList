@@ -45,7 +45,7 @@ class UserShowRating(models.Model):
                 SET
                     times_rated = times_rated + 1,
                     ratings_sum = ratings_sum + NEW.rating,
-                    rating = (ratings_sum + NEW.rating) / (times_rated + 1)
+                    rating = (ratings_sum + NEW.rating)::decimal / (times_rated + 1)
                 WHERE
                     id = NEW.show_id;
                 RETURN NEW;
@@ -61,7 +61,7 @@ class UserShowRating(models.Model):
                 SET
                     times_rated = times_rated - 1,
                     ratings_sum = ratings_sum - OLD.rating,
-                    rating = (ratings_sum - OLD.rating) / GREATEST(times_rated - 1, 1)
+                    rating = (ratings_sum - OLD.rating)::decimal / GREATEST(times_rated - 1, 1)
                 WHERE
                     id = OLD.show_id;
                 RETURN OLD;
@@ -76,7 +76,7 @@ class UserShowRating(models.Model):
                 UPDATE show
                 SET
                     ratings_sum = ratings_sum - OLD.rating + NEW.rating,
-                    rating = (ratings_sum - OLD.rating + NEW.rating) / times_rated
+                    rating = (ratings_sum - OLD.rating + NEW.rating)::decimal / times_rated
                 WHERE
                     id = OLD.show_id;
                 RETURN NEW;

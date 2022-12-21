@@ -12,7 +12,7 @@ from .models.show import Show
 
 
 class ShowsSearchSerializer(serializers.ModelSerializer):
-    my_list = serializers.CharField(allow_null=True)
+    my_list = serializers.IntegerField(allow_null=True)
     my_rate = serializers.IntegerField(allow_null=True)
 
     class Meta:
@@ -106,7 +106,7 @@ class ShowSerializer(serializers.ModelSerializer):
     )
     genres = GenreSerializer(many=True)
     countries = CountrySerializer(many=True)
-    my_list = serializers.CharField(allow_null=True)
+    my_list = serializers.IntegerField(allow_null=True)
     my_rate = serializers.IntegerField(allow_null=True)
     in_lists = serializers.IntegerField()
 

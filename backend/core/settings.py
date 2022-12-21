@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'shows.apps.ShowsConfig',
     'lists.apps.ListsConfig',
     'comments.apps.CommentsConfig',
+    'registry.apps.RegistryConfig',
 
     # 3rd party apps
     'corsheaders',
