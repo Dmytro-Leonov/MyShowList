@@ -59,7 +59,15 @@
   }
 
   .select-container .select__multi-value__remove:hover {
-    @apply rounded-r-md bg-transparent;
+    @apply rounded-r-md bg-transparent text-red-500;
+  }
+
+  .select-container .select__clear-indicator {
+    @apply transition-colors duration-200;
+  }
+
+  .select-container .select__clear-indicator:hover {
+    @apply text-red-500;
   }
 
   .select-container .select__input-container,

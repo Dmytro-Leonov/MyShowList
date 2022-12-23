@@ -38,8 +38,8 @@ export default function ShowDetails({ show, franchise }: { show: DetailedShow, f
 
   return (
     <>
-      <div className='w-[250px]'>
-        <div className='w-[250px] aspect-[2/3] relative rounded-md overflow-hidden mb-2'>
+      <div className='w-[250px] flex flex-col gap-4'>
+        <div className='w-[250px] aspect-[2/3] relative rounded-md overflow-hidden'>
           <Image
             src={show.poster}
             alt={show.english_name}
@@ -55,7 +55,7 @@ export default function ShowDetails({ show, franchise }: { show: DetailedShow, f
           isClearable={true}
           placeholder={'Add To List'}
         />
-        <div className='my-3'>
+        <div>
           <h3 className='text-2xl mb-2'>More Information:</h3>
           <div className='grid grid-cols-[max-content_auto] gap-y-1 gap-x-6'>
             <ShowPerson
