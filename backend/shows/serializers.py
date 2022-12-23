@@ -69,16 +69,20 @@ class CountrySerializer(serializers.ModelSerializer):
         )
 
 
-class ShowNameSerializer(serializers.ModelSerializer):
+class ShowInFranchiseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Show
         fields = (
+            'id',
+            'slug',
             'english_name',
+            'premiere_date',
+            'rating'
         )
 
 
 class FranchiseShowSerializer(serializers.ModelSerializer):
-    show = ShowNameSerializer()
+    show = ShowInFranchiseSerializer()
 
     class Meta:
         model = FranchiseShow

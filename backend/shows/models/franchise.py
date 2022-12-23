@@ -10,7 +10,7 @@ class FranchiseManager(models.Manager):
             .prefetch_related(
                 Prefetch(
                     'has_show__show',
-                    queryset=Show.objects.all().only('english_name'))
+                    queryset=Show.objects.all().only('slug', 'english_name', 'premiere_date', 'rating'))
             )
             .filter(has_show__show_id=show_id)
             .first()
