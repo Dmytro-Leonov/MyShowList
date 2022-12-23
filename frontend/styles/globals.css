@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base{
+  html {
+    @apply bg-dark-primary font-sans text-light-primary font-medium;
+  }
+  #__next {
+    @apply flex min-h-screen flex-col justify-between;
+  }
+  p {
+    @apply font-normal;
+  }
+  .link {
+    @apply text-blue-400 hover:text-blue-500 transition-colors hover:underline;
+  }
+}
+
+@layer components {
+  .select-container .select__control {
+    @apply bg-dark-primary border-light-primary cursor-pointer rounded-md;
+  }
+
+  .select-container .select__control:hover {
+    @apply border-light-primary;
+  }
+
+  .select-container .select__control--is-focused {
+    @apply border-light-primary hover:border-light-primary shadow-none;
+  }
+
+  .select-container .select__menu {
+    @apply bg-dark-primary border border-light-primary cursor-pointer rounded-md;
+  }
+
+  .select-container .select__menu * {
+    @apply cursor-pointer;
+  }
+
+  .select-container .select__option {
+    @apply bg-dark-primary hover:bg-dark-secondary;
+  }
+
+  .select-container .select__indicator-separator {
+    @apply bg-light-primary;
+  }
+
+  .select-container .select__indicator:hover {
+    @apply text-light-primary;
+  }
+
+  .select-container .select__multi-value  {
+    @apply bg-light-primary rounded-md text-dark-primary;
+  }
+
+  .select-container .select__multi-value__remove {
+    @apply transition-colors duration-200;
+  }
+
+  .select-container .select__multi-value__remove:hover {
+    @apply rounded-r-md bg-transparent;
+  }
+
+  .select-container .select__input-container,
+  .select-container .select__placeholder,
+  .select-container .select__single-value {
+    @apply text-neutral-200;
+  }
+}
