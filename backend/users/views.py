@@ -34,7 +34,6 @@ class CurrentUserView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = [MultiPartParser]
-    http_method_names = ['GET', 'POST']
 
     def get_object(self):
         return self.request.user
