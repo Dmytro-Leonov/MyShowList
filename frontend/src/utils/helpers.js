@@ -1,3 +1,3 @@
-export function roundRating(rating: number) {
+export function roundRating(rating) {
   return Math.round((rating + Number.EPSILON) * 100) / 100
 }

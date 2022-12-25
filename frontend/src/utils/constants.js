@@ -1,11 +1,11 @@
-export const Category: { [id: number]: string } = {
+export const Category = {
   1: 'Movie',
   2: 'TV Show',
   3: 'Cartoon',
   4: 'Anime'
 };
 
-export const AgeRating: { [id: number]: string } = {
+export const AgeRating = {
   1: '0+',
   2: '10+',
   3: '13+',
@@ -13,23 +13,17 @@ export const AgeRating: { [id: number]: string } = {
   5: '18+'
 };
 
-type List = {
-  id: number,
-  name: string,
-  color: string,
-}
-
-export const ListType: { [id: number]: List } = {
+export const ListType = {
   1: { id: 1, name: 'Watching',      color: 'bg-purple-500/90'  },
   2: { id: 2, name: 'Plan to Watch', color: 'bg-blue-500/90'   },
   3: { id: 3, name: 'Finished',      color: 'bg-green-500/90' },
   4: { id: 4, name: 'Dropped',       color: 'bg-red-500/90'    },
 };
 
-export const PersonType: {[id: number]: string} = {
+export const PersonType = {
   1: 'Producer',
   2: 'Writer',
   3: 'Actor'
 }
 
-export const maxNameLength: number = 100
+export const maxNameLength = 100

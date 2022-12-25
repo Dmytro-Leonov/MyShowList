@@ -1,19 +1,18 @@
-import { DetailedFranchise, DetailedShow, Person } from '../api/types';
-import Image from 'next/image';
-import { Category, AgeRating, ListType, PersonType } from './../constants'
+import { Category, AgeRating, ListType, PersonType } from '../utils/constants'
 import { AiFillStar } from 'react-icons/ai';
 import { BsFillPersonFill } from 'react-icons/bs'
 import { MdBookmarks } from 'react-icons/md'
-import Link from 'next/link';
 import ShowPerson from './ShowPerson';
 import FranchiseDetails from './FranchiseDetails';
-import { roundRating } from '../helpers';
+import { roundRating } from '../utils/helpers';
 import Select from 'react-select'
+import { Link } from "react-router-dom";
+import useInstance from '../hooks/useInstance';
 
-const GetDateWithLink = ({ date }: { date: Date }): JSX.Element => {
+const GetDateWithLink = ({ date }) => {
   return (
     <p>
-      <Link href={`/?year_gte=${date.getFullYear()}&year_lte=${date.getFullYear()}`}>
+      <Link to={`/?year_gte=${date.getFullYear()}&year_lte=${date.getFullYear()}`}>
         <span className='link'>{date.getFullYear()}</span>
       </Link>
       -{('0' + (date.getMonth() + 1)).slice(-2)}-{('0' + date.getDate()).slice(-2)}
@@ -21,16 +20,32 @@ const GetDateWithLink = ({ date }: { date: Date }): JSX.Element => {
   )
 }
 
-export default function ShowDetails({ show, franchise }: { show: DetailedShow, franchise: DetailedFranchise | null }) {
-  const lists = Object.keys(ListType).map((key) => { return { value: key, label: ListType[+key].name } })
-  let producers: Person[] = []
-  let actors: Person[] = []
-  let writers: Person[] = []
+
+
+export default function ShowDetails({ show, franchise }) {
+  const instance = useInstance()
+
+  const changeList = (selected) => {
+    if (selected)
+      instance.post('lists/add-show/', { show: show.id, list_type: selected.value })
+    else
+      instance.delete('lists/delete-show/', { data: { show: show.id } })
+  }
+
+  let user_list = null
+  const lists = Object.keys(ListType).map((key) => {
+    if (key == show.my_list)
+      user_list = { value: key, label: ListType[key].name }
+    return { value: key, label: ListType[key].name }
+  })
+  let producers = []
+  let actors = []
+  let writers = []
 
   show.people.forEach(show_person => {
-    if (PersonType[show_person.person_type] == 'Actor')
+    if (PersonType[show_person.person_type] === 'Actor')
       actors.push(show_person.person)
-    else if (PersonType[show_person.person_type] == 'Writer')
+    else if (PersonType[show_person.person_type] === 'Writer')
       writers.push(show_person.person)
     else
       producers.push(show_person.person)
@@ -40,17 +55,18 @@ export default function ShowDetails({ show, franchise }: { show: DetailedShow, f
     <>
       <div className='w-[250px] flex flex-col gap-4'>
         <div className='w-[250px] aspect-[2/3] relative rounded-md overflow-hidden'>
-          <Image
+          <img
             src={show.poster}
             alt={show.english_name}
-            fill={true}
-            className='aspect-[2/3]'
+            className='h-full'
           />
         </div>
         <Select
           className="select-container"
           classNamePrefix="select"
           options={lists}
+          defaultValue={user_list}
+          onChange={changeList}
           isSearchable={false}
           isClearable={true}
           placeholder={'Add To List'}
@@ -58,33 +74,11 @@ export default function ShowDetails({ show, franchise }: { show: DetailedShow, f
         <div>
           <h3 className='text-2xl mb-2'>More Information:</h3>
           <div className='grid grid-cols-[max-content_auto] gap-y-1 gap-x-6'>
-            <ShowPerson
-              people={writers}
-              name={'Writer'}
-              name_plural={'Writers'}
-            />
-            <ShowPerson
-              people={producers}
-              name={'Producer'}
-              name_plural={'Producers'}
-            />
+            
 
-            <ShowPerson
-              people={actors}
-              name={'Actor'}
-              name_plural={'Actors'}
-            />
-
-            {
-              show.slogan &&
-              <>
-                <div>Slogan:</div>
-                <p>{show.slogan}</p>
-              </>
-            }
             <div>Age rating:</div>
             <div>
-              <Link href={`/?age=${show.age_rating}`} className='block max-w-min'>
+              <Link to={`/?age=${show.age_rating}`} className='block max-w-min'>
                 <p className="link">{AgeRating[show.age_rating]}</p>
               </Link>
             </div>
@@ -93,7 +87,7 @@ export default function ShowDetails({ show, franchise }: { show: DetailedShow, f
             <GetDateWithLink date={new Date(show.premiere_date)} />
 
             {
-              show.finale_date && show.premiere_date !== show.finale_date &&
+              (show.finale_date && show.premiere_date !== show.finale_date) &&
               <>
                 <div>Finaly date:</div>
                 <GetDateWithLink date={new Date(show.finale_date)} />
@@ -116,7 +110,7 @@ export default function ShowDetails({ show, franchise }: { show: DetailedShow, f
               {
                 show.countries.map((country) => {
                   return (
-                    <Link href={`/?country=${country.id}`}>
+                    <Link to={`/?country=${country.id}`}>
                       <p className='link'>{country.name}</p>
                     </Link>
                   )
@@ -146,11 +140,37 @@ export default function ShowDetails({ show, franchise }: { show: DetailedShow, f
         </div>
         <div className='py-2'>
           <div className='mt-2'>
-            <h3 className='text-2xl mb-2'>Description:</h3>
+            {/* <h3 className='text-2xl mb-2'>Description:</h3> */}
             <p>{show.description}</p>
+            <div className='grid grid-cols-[max-content_auto] gap-y-1 gap-x-6 my-2'>
+              {
+                show.slogan &&
+                <>
+                  <div>Slogan:</div>
+                  <p>{show.slogan}</p>
+                </>
+              }
+              <ShowPerson
+              people={writers}
+              name={'Writer'}
+              name_plural={'Writers'}
+            />
+            <ShowPerson
+              people={producers}
+              name={'Producer'}
+              name_plural={'Producers'}
+            />
+
+            <ShowPerson
+              people={actors}
+              name={'Actor'}
+              name_plural={'Actors'}
+            />
+            </div>
+
             <div>
 
-              <div className='my-3'>
+              <div className='my-2'>
                 <FranchiseDetails franchise={franchise} current_id={show.id} />
               </div>
 

@@ -1,21 +1,20 @@
-import Link from 'next/link';
-import { DetailedFranchise } from '../api/types';
 import { VscTriangleRight } from 'react-icons/vsc'
 import { AiFillStar } from 'react-icons/ai';
-import { roundRating } from '../helpers';
+import { roundRating } from '../utils/helpers';
+import { Link } from "react-router-dom";
 
-export default function FranchiseDetails({ franchise, current_id }: { franchise: DetailedFranchise | null, current_id: number }) {
+export default function FranchiseDetails({franchise, current_id}) {
   return (
     <>
       {
-        franchise &&
+        franchise.shows.length != 0 &&
         <>
           <h3 className='text-2xl mb-2'>{franchise.name}:</h3>
           <div className='flex flex-col gap-2 text-ligh'>
             {
               franchise?.shows?.map(franchise_show => {
                 return (
-                  <Link href={`/show/${franchise_show.show.slug}`}>
+                  <Link to={`/show/${franchise_show.show.slug}`}>
                     <div className='w-full border radius-md py-2 px-4 flex items-center gap-4 rounded-md hover:text-light-secondary transition-colors'>
                       <div>
                         {franchise_show.watch_order}
@@ -32,7 +31,6 @@ export default function FranchiseDetails({ franchise, current_id }: { franchise:
                           <AiFillStar />
                           <span>{roundRating(franchise_show.show.rating)}</span>
                         </div>
-                        {/* {franchise_show.show.rating} */}
                       </div>
                     </div>
                   </Link>
