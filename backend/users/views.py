@@ -18,16 +18,20 @@ from .serializers import UserSerializer
 
 class GoogleAuth(APIView):
     def post(self, request, *args, **kwargs):
-        id_token = request.headers.get('Authorization')
-        user = google_parse_id_token(id_token=id_token)
+        access_token = request.headers.get('Authorization')
+        user, is_valid = google_parse_id_token(access_token=access_token)
+
+        if not is_valid:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
         picture_url = user.pop('picture')
         user_in_db, created = User.objects.get_or_create(**user)
         if created:
             picture = download_user_picture(url=picture_url)
             user_in_db.picture.save(name=picture.name, content=picture)
+
         data = {'token': AuthToken.objects.create(user_in_db)[1]}
-        response = Response(data=data, status=status.HTTP_202_ACCEPTED)
-        return response
+        return Response(data=data, status=status.HTTP_202_ACCEPTED)
 
 
 class CurrentUserView(generics.RetrieveUpdateAPIView):
