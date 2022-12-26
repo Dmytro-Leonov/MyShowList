@@ -44,14 +44,14 @@ class GetUserListShows(generics.ListAPIView):
         )
         return shows
 
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         list_shows = self.get_queryset().filter(
             user_lists__user=self.request.user,
             user_lists__list_type=serializer.validated_data.get('list_type')
         )
-        response = UserListShowsSerializer(list_shows, many=True).data
+        response = UserListShowsSerializer(list_shows, many=True, context={'request': request}).data
         return Response(data=response, status=status.HTTP_200_OK)
 
 
