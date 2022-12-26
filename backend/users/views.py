@@ -47,7 +47,7 @@ class CurrentUserView(generics.RetrieveUpdateAPIView):
         serializer.is_valid(raise_exception=True)
         user = self.request.user
 
-        if serializer.validated_data.pop('delete_image'):
+        if serializer.validated_data.pop('delete_picture'):
             user.picture.delete()
 
         picture = serializer.validated_data.pop('picture', None)

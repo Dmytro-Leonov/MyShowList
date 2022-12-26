@@ -4,7 +4,7 @@ from .models import User
 
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(read_only=True)
-    delete_image = serializers.BooleanField(write_only=True)
+    delete_picture = serializers.BooleanField(write_only=True)
 
     class Meta:
         model = User
@@ -12,5 +12,5 @@ class UserSerializer(serializers.ModelSerializer):
             'full_name',
             'email',
             'picture',
-            'delete_image'
+            'delete_picture'
         )

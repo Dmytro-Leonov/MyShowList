@@ -40,8 +40,8 @@ class CommentManager(models.Manager):
         # create filters based on input
         filters = {}
         if show_id:
-            filters.update(show_id=show_id)
-        elif parent_comment_id:
+            filters.update(show_id=show_id, parent_comment__isnull=True)
+        if parent_comment_id:
             filters.update(parent_comment=parent_comment_id)
 
         # compose query
