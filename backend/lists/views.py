@@ -94,8 +94,9 @@ class ListsShowCount(APIView):
             ListShow
             .objects
             .filter(user=self.request.user)
-            .annotate(show_count=Count('list_type'))
             .only('list_type')
+            .values('list_type')
+            .annotate(show_count=Count('list_type'))
         )
         response = self.serializer_class(lists_show_count, many=True).data
         return Response(data=response, status=status.HTTP_200_OK)
