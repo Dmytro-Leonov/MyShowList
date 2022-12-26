@@ -1,45 +1,136 @@
 import FiltersBlock from '../components/Filters'
 import Show from '../components/SearcShow'
 import useInstance from '../hooks/useInstance'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
 import { Oval } from 'react-loader-spinner'
+import { useState, useEffect } from 'react'
 
 export default function Home() {
   const instance = useInstance()
 
-  const { data, isLoading } = useQuery(['search'], () => { return instance.get(`/shows/`).then(res => res.data) }, {cacheTime: 0})
+  const perPage = 10
+
+  const [shows, setShows] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [page, setPage] = useState(0)
+  const [hasMore, setHasMore] = useState(false)
+  const [firstLoad, setFirstLoad] = useState(true)
+  const [searchParams, setSearchParams] = useState('')
+
+  useEffect(() => {
+    setIsLoading(true)
+    instance.get(`/shows/?limit=${perPage}&offset=${page * perPage}&${searchParams}`).then(res => {
+      if (!firstLoad)
+        setShows([...shows, ...res.data.results])
+      else
+        setShows(res.data.results)
+      setIsLoading(false)
+      setHasMore(res.data.next != null)
+      setFirstLoad(false)
+    })
+  }, [page, searchParams])
 
   return (
     <>
       <div className='flex gap-4 w-full'>
-        <div className='grid grid-cols-5 gap-4 w-4/5'>
-          {
-            !isLoading ?
-              data.results.map(show => {
-                return <Show key={show.slug} show={show} />
-              }) :
-              <div className='col-span-5 flex items-center justify-center'>
-                <Oval
-                  height={80}
-                  width={80}
-                  color="hsl(0deg 0% 100% / 77%)"
-                  wrapperStyle={{}}
-                  wrapperClass=""
-                  visible={true}
-                  ariaLabel='oval-loading'
-                  secondaryColor="hsl(0deg 0% 100% / 60%)"
-                  strokeWidth={2}
-                  strokeWidthSecondary={2}
-                />
-              </div>
-
-          }
+        <div className='flex flex-col gap-5 w-4/5 items-center'>
+          <div className='grid grid-cols-5 gap-4 grow'>
+            {
+              (!isLoading || !firstLoad) ?
+                shows.length !== 0 ?
+                  shows.map(show => {
+                    return <Show key={show.slug} show={show} />
+                  }) :
+                  <div className='col-span-5 flex items-center justify-center '>Nothing found</div> :
+                <div className='col-span-5 flex items-center justify-center'>
+                  <Oval
+                    height={80}
+                    width={80}
+                    color="hsl(0deg 0% 100% / 77%)"
+                    wrapperStyle={{}}
+                    wrapperClass=""
+                    visible={true}
+                    ariaLabel='oval-loading'
+                    secondaryColor="hsl(0deg 0% 100% / 60%)"
+                    strokeWidth={2}
+                    strokeWidthSecondary={2}
+                  />
+                </div>
+            }
+          </div>
+          <div>
+            {
+              (!isLoading && hasMore) &&
+              <button onClick={() => setPage(page + 1)} className='p-2 border rounded-md'>Load more...</button>
+            }
+          </div>
         </div>
         <div className='w-1/5'>
-          <FiltersBlock />
+          <FiltersBlock setSearchParams={setSearchParams} setFirstLoad={setFirstLoad} setPage={setPage} setsShows={setShows} />
         </div>
       </div>
-
     </>
   )
 }
+
+
+// export default function Home() {
+//   const instance = useInstance()
+
+//   const perPage = 2
+
+//   const [shows, setShows] = useState([])
+//   const [page, setPage] = useState(0)
+
+//   const { data, isLoading } = useInfiniteQuery(
+//     ['search', page],
+//     () => { return instance.get(`/shows/?limit=${perPage}&offset=${page * perPage}`).then(setShows[...shows, ]) },
+//     {
+//       cacheTime: 0,
+//       initialData: 
+//     }
+//   )
+
+//   return (
+//     <>
+//       <div className='flex gap-4 w-full'>
+//         <div className='flex flex-col gap-5 w-4/5 items-center'>
+//           <div className='grid grid-cols-5 gap-4'>
+//             {
+//               !isLoading ?
+//                 // console.log(data)
+//                 data.data.results.map(show => {
+//                   return <Show key={show.slug} show={show} />
+//                 })
+//                 :
+//                 <div className='col-span-5 flex items-center justify-center'>
+//                   <Oval
+//                     height={80}
+//                     width={80}
+//                     color="hsl(0deg 0% 100% / 77%)"
+//                     wrapperStyle={{}}
+//                     wrapperClass=""
+//                     visible={true}
+//                     ariaLabel='oval-loading'
+//                     secondaryColor="hsl(0deg 0% 100% / 60%)"
+//                     strokeWidth={2}
+//                     strokeWidthSecondary={2}
+//                   />
+//                 </div>
+//             }
+//           </div>
+//           <div>
+//             {
+//               (!isLoading && data.data.next) &&
+//               <button onClick={() => setPage(page + 1)} className='p-2 border rounded-md'>load more</button>
+//             }
+//           </div>
+//         </div>
+//         <div className='w-1/5'>
+//           <FiltersBlock />
+//         </div>
+//       </div>
+
+//     </>
+//   )
+// }

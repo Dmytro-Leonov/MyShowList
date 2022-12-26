@@ -27,3 +27,16 @@ export const PersonType = {
 }
 
 export const maxNameLength = 100
+
+export const Ratings = [
+  {rate: 10, name: "Masterpiece"},
+  {rate: 9, name: "Great"},
+  {rate: 8, name: "VeryGood"},
+  {rate: 7, name: "Good"},
+  {rate: 6, name: "Fine"},
+  {rate: 5, name: "Average"},
+  {rate: 4, name: "Bad"},
+  {rate: 3, name: "Very Bad"},
+  {rate: 2, name: "Horrible"},
+  {rate: 1, name: "Appalling"}
+]

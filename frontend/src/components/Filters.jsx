@@ -5,7 +5,7 @@ import axios from 'axios'
 
 
 
-export default function FiltersBlock() {
+export default function FiltersBlock({ setSearchParams, setFirstLoad, setPage }) {
   const [filters, setFilters] = useState()
 
   const getFilters = async () => {
@@ -30,14 +30,14 @@ export default function FiltersBlock() {
           animeGenres.current.push({ value: genre.id, label: genre.name })
       })
 
-      filters.countries.map( country => countries.current.push({ value: country.id, label: country.name }))
+      filters.countries.map(country => countries.current.push({ value: country.id, label: country.name }))
     }
 
-    return () => { 
+    return () => {
       movieGenres.current = []
       showGenres.current = []
       cartoonGenres.current = []
-      animeGenres.current = [] 
+      animeGenres.current = []
       countries.current = []
     }
   }, [filters])
@@ -72,31 +72,26 @@ export default function FiltersBlock() {
 
 
 
-  // const router = useRouter();
 
-  // useEffect(() => {
-  //   const { name, age, category, genre, year_gte, year_lte } = router.query
-  //   console.log(name, age, category, genre, year_gte, year_lte)
+  // const doFiltering = () => {
+  //   console.log(
+  //     showName, 
+  //     movies,
+  //     shows,
+  //     cartoons,
+  //     anime,
+  //     selectedAgeRatings, 
+  //     selectedCountries, 
+  //     selectedMovies, 
+  //     selectedShows, 
+  //     selectedCartoons, 
+  //     selectedAnime
+  //     )
 
-  //   if (year_gte) yearGTE.current.value = year_gte;
-  //   if (year_lte) yearLTE.current.value = year_lte;
-  //   showName.current.value = name ?? ''
-
-
-  //   let cats = []
-  //   if (Array.isArray(category)) cats = category
-  //   else if (typeof (category) === 'string') cats = [category]
-  //   array.forEach(element => {
-
-  //   });
-  // })
-
-  // cats.map(c => {
-
-  // })
+  // }
 
 
-  // parseQuery(router)
+
 
   useEffect(() => {
     const moviesBlock = document.getElementById('movies')
@@ -206,9 +201,12 @@ export default function FiltersBlock() {
     selectedAgeRatings.map((ageRating) => {
       query.append("age", ageRating.value)
     })
+    selectedCountries.map((country) => {
+      query.append("country", country.value)
+    })
     const genres = [...selectedMovies, ...selectedShows, ...selectedCartoons, ...selectedAnime]
     genres.map((genre) => {
-      query.append('genre', genre.value)
+      query.append('genre_exact', genre.value)
     })
 
     if (yearGTE.current)
@@ -216,8 +214,10 @@ export default function FiltersBlock() {
     if (yearLTE.current)
       query.append('year_lte', yearLTE.current.value)
 
-    // console.log(query.toString())
-
+    setSearchParams(query.toString())
+    setFirstLoad(true)
+    setPage(0)
+    console.log(query.toString())
   }
 
   return (

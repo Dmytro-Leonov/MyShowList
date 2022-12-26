@@ -14,7 +14,7 @@ export default function FranchiseDetails({franchise, current_id}) {
             {
               franchise?.shows?.map(franchise_show => {
                 return (
-                  <Link to={`/show/${franchise_show.show.slug}`}>
+                  <Link key={franchise_show.show.id} to={`/show/${franchise_show.show.slug}`}>
                     <div className='w-full border radius-md py-2 px-4 flex items-center gap-4 rounded-md hover:text-light-secondary transition-colors'>
                       <div>
                         {franchise_show.watch_order}

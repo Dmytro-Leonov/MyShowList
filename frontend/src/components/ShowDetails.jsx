@@ -1,4 +1,4 @@
-import { Category, AgeRating, ListType, PersonType } from '../utils/constants'
+import { Category, AgeRating, ListType, PersonType, Ratings } from '../utils/constants'
 import { AiFillStar } from 'react-icons/ai';
 import { BsFillPersonFill } from 'react-icons/bs'
 import { MdBookmarks } from 'react-icons/md'
@@ -8,6 +8,10 @@ import { roundRating } from '../utils/helpers';
 import Select from 'react-select'
 import { Link } from "react-router-dom";
 import useInstance from '../hooks/useInstance';
+import Modal from './Modal'
+import { useState } from 'react';
+import { UserContext } from '../UserContext';
+import { useContext } from 'react';
 
 const GetDateWithLink = ({ date }) => {
   return (
@@ -51,8 +55,44 @@ export default function ShowDetails({ show, franchise }) {
       producers.push(show_person.person)
   })
 
+  const [isOpened, setIsOpened] = useState(false)
+
+  const rateShow = (rating) => {
+    instance.post('shows/show/rate/', { show: show.id, rating: rating })
+    setMyRate(rating)
+    setIsOpened(false)
+  }
+
+  const [myRate, setMyRate] = useState(show.my_rate)
+  const {user,} = useContext(UserContext)
+
   return (
     <>
+      {
+        (isOpened && user) &&
+        <Modal
+          setIsOpened={setIsOpened}
+          children={
+            <div className='flex flex-col gap-2 w-[200px]'>
+              {
+                Ratings.map(rating => {
+                  return (
+                    <button
+                      key={rating.rate}
+                      value={rating.rate}
+                      onClick={() => rateShow(rating.rate)}
+                      className={myRate === rating.rate ? 'w-full text-left py-2 px-5 rounded-md border' : 'w-full text-left py-2 px-5 rounded-md'}
+                    >
+                      {rating.rate}: {rating.name}
+                    </button>
+                  )
+                })
+              }
+            </div>
+
+          }
+        />
+      }
       <div className='w-[250px] flex flex-col gap-4'>
         <div className='w-[250px] aspect-[2/3] relative rounded-md overflow-hidden'>
           <img
@@ -74,7 +114,7 @@ export default function ShowDetails({ show, franchise }) {
         <div>
           <h3 className='text-2xl mb-2'>More Information:</h3>
           <div className='grid grid-cols-[max-content_auto] gap-y-1 gap-x-6'>
-            
+
 
             <div>Age rating:</div>
             <div>
@@ -110,7 +150,7 @@ export default function ShowDetails({ show, franchise }) {
               {
                 show.countries.map((country) => {
                   return (
-                    <Link to={`/?country=${country.id}`}>
+                    <Link key={country.id} to={`/?country=${country.id}`}>
                       <p className='link'>{country.name}</p>
                     </Link>
                   )
@@ -125,10 +165,10 @@ export default function ShowDetails({ show, franchise }) {
           <h1 className='text-4xl'>{show.english_name}</h1>
           <h3 className='text-xl text-light-secondary'>{show.alt_names.join(' / ')}</h3>
           <div className='flex py-3 gap-5 items-center text-lg'>
-            <div className='bg-yellow-500 hover:text-gray-200 hover:bg-yellow-500/90 transition-colors px-2 py-1 rounded-md text-white flex items-center gap-1 cursor-pointer'>
+            <button onClick={() => setIsOpened(true)} className='bg-yellow-500 hover:text-gray-200 hover:bg-yellow-500/90 transition-colors px-2 py-1 rounded-md text-white flex items-center gap-1 cursor-pointer'>
               <AiFillStar size={20} />
               <span>{roundRating(show.rating)}</span>
-            </div>
+            </button>
             <div className='flex items-center gap-1'>
               <BsFillPersonFill size={20} /> {show.times_rated}
             </div>
@@ -151,21 +191,22 @@ export default function ShowDetails({ show, franchise }) {
                 </>
               }
               <ShowPerson
-              people={writers}
-              name={'Writer'}
-              name_plural={'Writers'}
-            />
-            <ShowPerson
-              people={producers}
-              name={'Producer'}
-              name_plural={'Producers'}
-            />
+                people={writers}
+                name={'Writer'}
+                name_plural={'Writers'}
+              />
 
-            <ShowPerson
-              people={actors}
-              name={'Actor'}
-              name_plural={'Actors'}
-            />
+              <ShowPerson
+                people={producers}
+                name={'Producer'}
+                name_plural={'Producers'}
+              />
+
+              <ShowPerson
+                people={actors}
+                name={'Actor'}
+                name_plural={'Actors'}
+              />
             </div>
 
             <div>
