@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import MinLengthValidator
-from django.db.models import Count, Subquery, OuterRef, BooleanField, Exists
+from django.db.models import Count, Subquery, OuterRef, IntegerField, Exists
 
 
 class CommentManager(models.Manager):
@@ -9,14 +9,12 @@ class CommentManager(models.Manager):
         from comments.models import CommentVote
         subquery = (
             Subquery(
-                Exists(
-                    CommentVote.objects.filter(
-                        user=user,
-                        comment_id=OuterRef('id')
-                    )
-                    .values('id')
-                ),
-                output_field=BooleanField()
+                CommentVote.objects.filter(
+                    user=user,
+                    comment_id=OuterRef('id')
+                )
+                .values('vote'),
+                output_field=IntegerField(null=True)
             )
         )
         return subquery
@@ -34,7 +32,7 @@ class CommentManager(models.Manager):
             )
         if user and user.is_authenticated:
             annotation.update(
-                voted=self._get_user_vote_subquery(user)
+                user_vote=self._get_user_vote_subquery(user)
             )
 
         # create filters based on input

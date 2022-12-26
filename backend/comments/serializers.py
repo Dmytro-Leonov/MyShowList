@@ -21,7 +21,7 @@ class CommentSerializer(serializers.ModelSerializer):
     replies_count = serializers.IntegerField(allow_null=True)
     user = CommentUserSerializer()
     reply_to_user = CommentUserSerializer()
-    voted = serializers.BooleanField(allow_null=True)
+    user_vote = serializers.IntegerField(allow_null=True)
 
     class Meta:
         model = Comment
@@ -34,7 +34,7 @@ class CommentSerializer(serializers.ModelSerializer):
             'parent_comment',
             'reply_to_user',
             'replies_count',
-            'voted'
+            'user_vote'
         )
 
 
