@@ -26,10 +26,10 @@ class CommentManager(models.Manager):
 
         # create annotations based on input
         annotation = {}
-        if not parent_comment_id:
-            annotation.update(
-                {'replies_count': Count('child_comments')}
-            )
+        # if not parent_comment_id:
+        annotation.update(
+            {'replies_count': Count('child_comments')}
+        )
         if user and user.is_authenticated:
             annotation.update(
                 user_vote=self._get_user_vote_subquery(user)

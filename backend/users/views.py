@@ -25,10 +25,15 @@ class GoogleAuth(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         picture_url = user.pop('picture')
-        user_in_db, created = User.objects.get_or_create(**user)
+        email = user.pop('email')
+        user_in_db, created = User.objects.get_or_create(email=email)
+
         if created:
+            for attr, val in user.items():
+                setattr(user_in_db, attr, val)
             picture = download_user_picture(url=picture_url)
             user_in_db.picture.save(name=picture.name, content=picture)
+            user_in_db.save()
 
         data = {'token': AuthToken.objects.create(user_in_db)[1]}
         return Response(data=data, status=status.HTTP_202_ACCEPTED)
