@@ -15,7 +15,7 @@ export default function FranchiseDetails({franchise, current_id}) {
               franchise?.shows?.map(franchise_show => {
                 return (
                   <Link key={franchise_show.show.id} to={`/show/${franchise_show.show.slug}`}>
-                    <div className='w-full border radius-md py-2 px-4 flex items-center gap-4 rounded-md hover:text-light-secondary transition-colors'>
+                    <div className='w-full border radius-md py-3 px-4 flex items-center gap-4 rounded-md hover:text-light-secondary transition-colors'>
                       <div>
                         {franchise_show.watch_order}
                       </div>
@@ -27,7 +27,7 @@ export default function FranchiseDetails({franchise, current_id}) {
                         {new Date(franchise_show.show.premiere_date).getFullYear()}
                       </div>
                       <div className='w-20'>
-                        <div className='px-2 py-1 rounded-md flex items-center gap-1'>
+                        <div className='flex items-center gap-1 text-yellow-500/90'>
                           <AiFillStar />
                           <span>{roundRating(franchise_show.show.rating)}</span>
                         </div>

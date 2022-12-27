@@ -1,7 +1,6 @@
 import FiltersBlock from '../components/Filters'
 import Show from '../components/SearcShow'
 import useInstance from '../hooks/useInstance'
-import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
 import { Oval } from 'react-loader-spinner'
 import { useState, useEffect } from 'react'
 
@@ -72,65 +71,3 @@ export default function Home() {
     </>
   )
 }
-
-
-// export default function Home() {
-//   const instance = useInstance()
-
-//   const perPage = 2
-
-//   const [shows, setShows] = useState([])
-//   const [page, setPage] = useState(0)
-
-//   const { data, isLoading } = useInfiniteQuery(
-//     ['search', page],
-//     () => { return instance.get(`/shows/?limit=${perPage}&offset=${page * perPage}`).then(setShows[...shows, ]) },
-//     {
-//       cacheTime: 0,
-//       initialData: 
-//     }
-//   )
-
-//   return (
-//     <>
-//       <div className='flex gap-4 w-full'>
-//         <div className='flex flex-col gap-5 w-4/5 items-center'>
-//           <div className='grid grid-cols-5 gap-4'>
-//             {
-//               !isLoading ?
-//                 // console.log(data)
-//                 data.data.results.map(show => {
-//                   return <Show key={show.slug} show={show} />
-//                 })
-//                 :
-//                 <div className='col-span-5 flex items-center justify-center'>
-//                   <Oval
-//                     height={80}
-//                     width={80}
-//                     color="hsl(0deg 0% 100% / 77%)"
-//                     wrapperStyle={{}}
-//                     wrapperClass=""
-//                     visible={true}
-//                     ariaLabel='oval-loading'
-//                     secondaryColor="hsl(0deg 0% 100% / 60%)"
-//                     strokeWidth={2}
-//                     strokeWidthSecondary={2}
-//                   />
-//                 </div>
-//             }
-//           </div>
-//           <div>
-//             {
-//               (!isLoading && data.data.next) &&
-//               <button onClick={() => setPage(page + 1)} className='p-2 border rounded-md'>load more</button>
-//             }
-//           </div>
-//         </div>
-//         <div className='w-1/5'>
-//           <FiltersBlock />
-//         </div>
-//       </div>
-
-//     </>
-//   )
-// }

@@ -6,25 +6,13 @@ import ShowPerson from './ShowPerson';
 import FranchiseDetails from './FranchiseDetails';
 import { roundRating } from '../utils/helpers';
 import Select from 'react-select'
-import { Link } from "react-router-dom";
 import useInstance from '../hooks/useInstance';
 import Modal from './Modal'
 import { useState } from 'react';
 import { UserContext } from '../UserContext';
 import { useContext } from 'react';
-
-const GetDateWithLink = ({ date }) => {
-  return (
-    <p>
-      <Link to={`/?year_gte=${date.getFullYear()}&year_lte=${date.getFullYear()}`}>
-        <span className='link'>{date.getFullYear()}</span>
-      </Link>
-      -{('0' + (date.getMonth() + 1)).slice(-2)}-{('0' + date.getDate()).slice(-2)}
-    </p>
-  )
-}
-
-
+import CommentsBlock from './CommentsBlock'
+import { useQuery } from '@tanstack/react-query'
 
 export default function ShowDetails({ show, franchise }) {
   const instance = useInstance()
@@ -58,13 +46,26 @@ export default function ShowDetails({ show, franchise }) {
   const [isOpened, setIsOpened] = useState(false)
 
   const rateShow = (rating) => {
-    instance.post('shows/show/rate/', { show: show.id, rating: rating })
-    setMyRate(rating)
+    if (myRate !== rating) {
+      instance.post('shows/show/rate/', { show: show.id, rating: rating })
+      setMyRate(rating)
+    }
+    else {
+      instance.delete('shows/show/rate/', { data: { show: show.id } })
+      setMyRate(null)
+    }
     setIsOpened(false)
+
   }
 
   const [myRate, setMyRate] = useState(show.my_rate)
-  const {user,} = useContext(UserContext)
+  const { user, } = useContext(UserContext)
+
+  const { data: comments, isLoading } = useQuery(
+    ["show-comments"],
+    () => { return instance.get(`/comments/for-show/${show.id}/`).then(res => res.data) },
+    { cacheTime: 0, }
+  )
 
   return (
     <>
@@ -101,36 +102,35 @@ export default function ShowDetails({ show, franchise }) {
             className='h-full'
           />
         </div>
-        <Select
-          className="select-container"
-          classNamePrefix="select"
-          options={lists}
-          defaultValue={user_list}
-          onChange={changeList}
-          isSearchable={false}
-          isClearable={true}
-          placeholder={'Add To List'}
-        />
+        {
+          user ?
+            <Select
+              className="select-container"
+              classNamePrefix="select"
+              options={lists}
+              defaultValue={user_list}
+              onChange={changeList}
+              isSearchable={false}
+              isClearable={true}
+              placeholder={'Add To List'}
+            />
+            : <div className='p-2 border select-none border-yellow-200/70 text-center text-yellow-200/70 rounded md'>Sign In to add this shw to list</div>
+        }
         <div>
           <h3 className='text-2xl mb-2'>More Information:</h3>
           <div className='grid grid-cols-[max-content_auto] gap-y-1 gap-x-6'>
 
-
             <div>Age rating:</div>
-            <div>
-              <Link to={`/?age=${show.age_rating}`} className='block max-w-min'>
-                <p className="link">{AgeRating[show.age_rating]}</p>
-              </Link>
-            </div>
+            <p>{AgeRating[show.age_rating]}</p>
 
             <div>Premiere date:</div>
-            <GetDateWithLink date={new Date(show.premiere_date)} />
+            <p>{show.premiere_date}</p>
 
             {
               (show.finale_date && show.premiere_date !== show.finale_date) &&
               <>
                 <div>Finaly date:</div>
-                <GetDateWithLink date={new Date(show.finale_date)} />
+                <p>{show.finale_date}</p>
               </>
             }
 
@@ -144,19 +144,6 @@ export default function ShowDetails({ show, franchise }) {
                 <p>{show.episodes}</p>
               </>
             }
-
-            <div>{show.countries.length > 1 ? 'Countries' : 'Country'}:</div>
-            <div className='flex gap-x-3'>
-              {
-                show.countries.map((country) => {
-                  return (
-                    <Link key={country.id} to={`/?country=${country.id}`}>
-                      <p className='link'>{country.name}</p>
-                    </Link>
-                  )
-                })
-              }
-            </div>
           </div>
         </div>
       </div>
@@ -180,7 +167,7 @@ export default function ShowDetails({ show, franchise }) {
         </div>
         <div className='py-2'>
           <div className='mt-2'>
-            {/* <h3 className='text-2xl mb-2'>Description:</h3> */}
+            <h3 className='text-2xl mb-2'>Description:</h3>
             <p>{show.description}</p>
             <div className='grid grid-cols-[max-content_auto] gap-y-1 gap-x-6 my-2'>
               {
@@ -207,15 +194,30 @@ export default function ShowDetails({ show, franchise }) {
                 name={'Actor'}
                 name_plural={'Actors'}
               />
+              <div>{show.countries.length > 1 ? 'Countries' : 'Country'}:</div>
+              <p>
+                {
+                  show.countries.map((country) => {
+                    return (
+                      country.name
+                    )
+                  }).join(', ')
+                }
+              </p>
             </div>
 
-            <div>
-
-              <div className='my-2'>
-                <FranchiseDetails franchise={franchise} current_id={show.id} />
-              </div>
-
+            <div className='my-2'>
+              <FranchiseDetails franchise={franchise} current_id={show.id} />
             </div>
+            {
+              !isLoading &&
+                comments.results.length !== 0 ?
+                <>
+                  <h3 className='text-2xl'>Comments:</h3>
+                  <CommentsBlock comments={comments} />
+                </>
+                : <h3 className='text-2xl'>Be the first one to comment:</h3>
+            }
           </div>
         </div>
       </div>

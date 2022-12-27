@@ -70,29 +70,6 @@ export default function FiltersBlock({ setSearchParams, setFirstLoad, setPage })
   const [selectedCartoons, setSelectedCartoons] = useState([])
   const [selectedAnime, setSelectedAnime] = useState([])
 
-
-
-
-  // const doFiltering = () => {
-  //   console.log(
-  //     showName, 
-  //     movies,
-  //     shows,
-  //     cartoons,
-  //     anime,
-  //     selectedAgeRatings, 
-  //     selectedCountries, 
-  //     selectedMovies, 
-  //     selectedShows, 
-  //     selectedCartoons, 
-  //     selectedAnime
-  //     )
-
-  // }
-
-
-
-
   useEffect(() => {
     const moviesBlock = document.getElementById('movies')
     const showsBlock = document.getElementById('shows')
@@ -217,7 +194,6 @@ export default function FiltersBlock({ setSearchParams, setFirstLoad, setPage })
     setSearchParams(query.toString())
     setFirstLoad(true)
     setPage(0)
-    console.log(query.toString())
   }
 
   return (

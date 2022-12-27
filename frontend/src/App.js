@@ -1,4 +1,3 @@
-import './App.css';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { Route, Routes } from 'react-router-dom';
@@ -10,6 +9,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import useInstance from './hooks/useInstance';
 import { UserContext } from './UserContext';
+import Profile from './pages/Profile'
 
 export default function App() {
   const client = new QueryClient({
@@ -52,6 +52,7 @@ export default function App() {
               <Routes>
                 <Route exact path='/' element={<Home />} />
                 <Route exact path='/show/:slug' element={<Show />} />
+                <Route exact path='/profile' element={<Profile />} />
                 <Route exact path='*' element={<PageNotFound />} />
               </Routes>
             </div>

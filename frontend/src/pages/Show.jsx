@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import useInstance from '../hooks/useInstance'
 import { useParams } from 'react-router-dom'
 import { Oval } from 'react-loader-spinner'
+import PageNotFound from './404'
 
 
 export default function Show() {
@@ -19,24 +20,26 @@ export default function Show() {
     <>
       {
         !isLoading ?
-          <ShowDetails
-            show={{ ...data.show }}
-            franchise={{ ...data.franchise }}
-          /> :
-          <div className='flex items-center justify-center w-full'>
-            <Oval
-              height={80}
-              width={80}
-              color="hsl(0deg 0% 100% / 77%)"
-              wrapperStyle={{}}
-              wrapperClass=""
-              visible={true}
-              ariaLabel='oval-loading'
-              secondaryColor="hsl(0deg 0% 100% / 60%)"
-              strokeWidth={2}
-              strokeWidthSecondary={2}
-            />
-          </div>
+          !data ?
+          <PageNotFound /> :
+            <ShowDetails
+              show={{ ...data.show }}
+              franchise={{ ...data.franchise }}
+            /> :
+            <div className='flex items-center justify-center w-full'>
+              <Oval
+                height={80}
+                width={80}
+                color="hsl(0deg 0% 100% / 77%)"
+                wrapperStyle={{}}
+                wrapperClass=""
+                visible={true}
+                ariaLabel='oval-loading'
+                secondaryColor="hsl(0deg 0% 100% / 60%)"
+                strokeWidth={2}
+                strokeWidthSecondary={2}
+              />
+            </div>
       }
 
     </>
