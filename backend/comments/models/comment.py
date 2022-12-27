@@ -26,7 +26,7 @@ class CommentManager(models.Manager):
 
         # create annotations based on input
         annotation = {}
-        if parent_comment_id:
+        if not parent_comment_id:
             annotation.update(
                 {'replies_count': Count('child_comments')}
             )
@@ -59,7 +59,7 @@ class CommentManager(models.Manager):
                 'reply_to_user__full_name',
                 'date_created',
                 'text',
-                'likes'
+                'likes',
             )
         )
         return comments
