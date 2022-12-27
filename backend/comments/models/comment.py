@@ -71,8 +71,8 @@ class Comment(models.Model):
         to='shows.Show',
         on_delete=models.CASCADE,
         related_name='comments',
-        blank=False,
-        null=False
+        blank=True,
+        null=True
     )
     user = models.ForeignKey(
         to='users.User',

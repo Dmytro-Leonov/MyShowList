@@ -1,13 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
 import useInstance from '../hooks/useInstance'
 import pic from '../assets/default_user_avatar.png'
-import { RxTriangleRight, RxTriangleDown, RxTriangleUp } from 'react-icons/rx'
+import { RxTriangleDown, RxTriangleUp } from 'react-icons/rx'
 import { IoReturnUpBack } from 'react-icons/io5'
 import { AiFillDislike, AiFillLike, AiOutlineDislike, AiOutlineLike } from 'react-icons/ai'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import CommentsBlock from './CommentsBlock'
+import CommentForm from './CommentForm'
 
 dayjs.extend(relativeTime)
 
@@ -49,8 +50,26 @@ export default function Comment({ comment }) {
 
   const openReplies = () => {
     setRepliesShown(!repliesShown)
-    !replies &&
-      fetchReplies()
+    !replies && fetchReplies()
+  }
+
+  const commentTex = useRef()
+  const [isReplyFormVisible, setIsReplyFormVisible] = useState(false)
+
+  const submitComment = () => {
+    const commentT = commentTex.current.value.trim()
+    if (commentT)
+      instance.post('comments/', { show: comment.show, parent_comment: comment.id, reply_to_user: comment.user.id, text: commentTex.current.value })
+        .then((res) => {
+          commentTex.current.value = ''
+          setIsReplyFormVisible(false)
+        })
+        .catch()
+  }
+
+  const cancelComment = () => {
+    setIsReplyFormVisible(false)
+    commentTex.current.value = ''
   }
 
   return (
@@ -80,8 +99,18 @@ export default function Comment({ comment }) {
             {repliesShown ? <RxTriangleUp size={20} /> : <RxTriangleDown size={20} />} {comment.replies_count} {comment.replies_count == 1 ? 'reply' : 'replies'}
           </p>
         }
-        <p className='select-none rounded-md py-1 px-2 hover:bg-dark-secondary hover:cursor-pointer text-sm text-blue-500 flex items-center gap-1'><IoReturnUpBack />Reply</p>
+        <p onClick={() => setIsReplyFormVisible(!isReplyFormVisible)} className='select-none rounded-md py-1 px-2 hover:bg-dark-secondary hover:cursor-pointer text-sm text-blue-500 flex items-center gap-1'><IoReturnUpBack />Reply</p>
       </div>
+      {
+        isReplyFormVisible &&
+        <CommentForm
+          textRef={commentTex}
+          onCancel={cancelComment}
+          onSubmit={submitComment}
+          cancelText={'Cancel'}
+          submitText={'Send'}
+        />
+      }
       {
         !loadingReplies && comment.replies_count !== 0 && repliesShown ? <CommentsBlock comments={replies} /> : null
       }

@@ -1,5 +1,5 @@
 import { Category, AgeRating, ListType, PersonType, Ratings } from '../utils/constants'
-import { AiFillStar } from 'react-icons/ai';
+import { AiFillStar, AiOutlinePlusCircle } from 'react-icons/ai';
 import { BsFillPersonFill } from 'react-icons/bs'
 import { MdBookmarks } from 'react-icons/md'
 import ShowPerson from './ShowPerson';
@@ -8,11 +8,12 @@ import { roundRating } from '../utils/helpers';
 import Select from 'react-select'
 import useInstance from '../hooks/useInstance';
 import Modal from './Modal'
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { UserContext } from '../UserContext';
 import { useContext } from 'react';
 import CommentsBlock from './CommentsBlock'
 import { useQuery } from '@tanstack/react-query'
+import CommentForm from './CommentForm'
 
 export default function ShowDetails({ show, franchise }) {
   const instance = useInstance()
@@ -63,9 +64,29 @@ export default function ShowDetails({ show, franchise }) {
 
   const { data: comments, isLoading } = useQuery(
     ["show-comments"],
-    () => { return instance.get(`/comments/for-show/${show.id}/`).then(res => res.data) },
+    () => { return instance.get(`/comments/for-show/${show.id}/?order=-date`).then(res => res.data) },
     { cacheTime: 0, }
   )
+
+  const commentTex = useRef()
+
+  const submitComment = () => {
+    const comment = commentTex.current.value.trim()
+    if (comment)
+      instance.post('comments/', { show: show.id, text: comment })
+        .then(res => res.data)
+        .then(data => {
+          commentTex.current.value = ''
+        })
+        .catch()
+  }
+
+  const cancelComment = () => {
+    commentTex.current.value = ''
+    setIsCommentFormVisible(!isCommentFormVisible)
+  }
+
+  const [isCommentFormVisible, setIsCommentFormVisible] = useState(false)
 
   return (
     <>
@@ -209,14 +230,27 @@ export default function ShowDetails({ show, franchise }) {
             <div className='my-2'>
               <FranchiseDetails franchise={franchise} current_id={show.id} />
             </div>
+            <div className="flex gap-4 items-center">
+              <h3 className='text-2xl mb-2'>Comments:</h3>
+              {
+                !isCommentFormVisible &&
+                <AiOutlinePlusCircle onClick={() => setIsCommentFormVisible(!isCommentFormVisible)} size={25} className='cursor-pointer hover:rotate-180 transition-transform' />
+              }
+            </div>
+            {
+              isCommentFormVisible &&
+              <CommentForm
+                textRef={commentTex}
+                onCancel={cancelComment}
+                onSubmit={submitComment}
+                cancelText={'Cancel'}
+                submitText={'Send'}
+              />
+            }
             {
               !isLoading &&
-                comments.results.length !== 0 ?
-                <>
-                  <h3 className='text-2xl'>Comments:</h3>
-                  <CommentsBlock comments={comments} />
-                </>
-                : <h3 className='text-2xl'>Be the first one to comment:</h3>
+              comments.results.length !== 0 &&
+              <CommentsBlock comments={comments} />
             }
           </div>
         </div>
