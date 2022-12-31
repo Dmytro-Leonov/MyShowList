@@ -18,7 +18,7 @@ export default function Home() {
 
   useEffect(() => {
     setIsLoading(true)
-    instance.get(`/shows/?limit=${perPage}&offset=${page * perPage}&${searchParams}`).then(res => {
+    instance.get(`/shows/?order=-rating&limit=${perPage}&offset=${page * perPage}&${searchParams}`).then(res => {
       if (!firstLoad)
         setShows([...shows, ...res.data.results])
       else

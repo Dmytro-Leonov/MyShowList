@@ -68,7 +68,7 @@ export default function Profile() {
                 <div className='flex flex-col gap-2 items-start'>
                   <div className='flex flex-col w-full'>
                     <label htmlFor="full_name">Full name:</label>
-                    <input ref={fullName} id='full_name' value={user.full_name} type="text" placeholder='Full name' className='bg-dark-primary rounded-md border p-2 focus-visible:border' />
+                    <input ref={fullName} id='full_name' defaultValue={user.full_name} type="text" placeholder='Full name' className='bg-dark-primary rounded-md border p-2 focus-visible:border' />
                   </div>
 
                   <div className='flex flex-col'>
