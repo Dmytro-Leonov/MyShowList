@@ -183,7 +183,7 @@ export default function FiltersBlock({ setSearchParams, setFirstLoad, setPage })
     })
     const genres = [...selectedMovies, ...selectedShows, ...selectedCartoons, ...selectedAnime]
     genres.map((genre) => {
-      query.append('genre_exact', genre.value)
+      query.append('genre_broad', genre.value)
     })
 
     if (yearGTE.current)

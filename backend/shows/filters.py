@@ -2,7 +2,8 @@ from django_filters import rest_framework as filters
 from django.db.models import Q
 from .models import (
     Show,
-    Genre
+    Genre,
+    Country
 )
 
 
@@ -24,6 +25,12 @@ class ShowFilter(filters.FilterSet):
     age = filters.MultipleChoiceFilter(
         field_name="age_rating",
         choices=Show.AgeRating.choices
+    )
+    country = filters.ModelMultipleChoiceFilter(
+        field_name='countries__id',
+        to_field_name='id',
+        queryset=Country.objects.all(),
+        conjoined=False
     )
     genre_broad = filters.ModelMultipleChoiceFilter(
         field_name='genres__id',
@@ -66,6 +73,7 @@ class ShowFilter(filters.FilterSet):
             'year_lte',
             'category',
             'age',
+            'country',
             'genre_broad',
             'genre_exact',
             'genre_exclude'
