@@ -233,7 +233,7 @@ export default function ShowDetails({ show, franchise }) {
             <div className="flex gap-4 items-center">
               <h3 className='text-2xl mb-2'>Comments:</h3>
               {
-                !isCommentFormVisible &&
+                (!isCommentFormVisible && user) &&
                 <AiOutlinePlusCircle onClick={() => setIsCommentFormVisible(!isCommentFormVisible)} size={25} className='cursor-pointer hover:rotate-180 transition-transform' />
               }
             </div>
